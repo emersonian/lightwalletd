@@ -719,7 +719,7 @@ func (s *lwdStreamer) GetSubtreeRoots(arg *walletrpc.GetSubtreeRootsArg, resp wa
 	for i := 0; i < len(reply.Subtrees); i++ {
 		subtree := reply.Subtrees[i]
 		block, err := common.GetBlock(s.cache, subtree.End_height)
-		if block == nil {
+		if err != nil || block == nil {
 			return errors.New("getblock failed")
 		}
 		roothash, err := hex.DecodeString(subtree.Root)
