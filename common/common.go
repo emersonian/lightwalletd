@@ -234,6 +234,19 @@ func FirstRPC() {
 	}
 }
 
+func GetInfo() (*ZcashdRpcReplyGetinfo, error) {
+	result, rpcErr := RawRequest("getinfo", []json.RawMessage{})
+	if rpcErr != nil {
+		return nil, rpcErr
+	}
+	var getinfoReply ZcashdRpcReplyGetinfo
+	err := json.Unmarshal(result, &getinfoReply)
+	if err != nil {
+		return nil, rpcErr
+	}
+	return &getinfoReply, nil
+}
+
 func GetBlockChainInfo() (*ZcashdRpcReplyGetblockchaininfo, error) {
 	result, rpcErr := RawRequest("getblockchaininfo", []json.RawMessage{})
 	if rpcErr != nil {
@@ -248,23 +261,12 @@ func GetBlockChainInfo() (*ZcashdRpcReplyGetblockchaininfo, error) {
 }
 
 func GetLightdInfo() (*walletrpc.LightdInfo, error) {
-	result, rpcErr := RawRequest("getinfo", []json.RawMessage{})
+	getinfoReply, rpcErr := GetInfo()
 	if rpcErr != nil {
 		return nil, rpcErr
 	}
-	var getinfoReply ZcashdRpcReplyGetinfo
-	err := json.Unmarshal(result, &getinfoReply)
-	if err != nil {
-		return nil, rpcErr
-	}
-
-	result, rpcErr = RawRequest("getblockchaininfo", []json.RawMessage{})
+	getblockchaininfoReply, rpcErr := GetBlockChainInfo()
 	if rpcErr != nil {
-		return nil, rpcErr
-	}
-	var getblockchaininfoReply ZcashdRpcReplyGetblockchaininfo
-	err = json.Unmarshal(result, &getblockchaininfoReply)
-	if err != nil {
 		return nil, rpcErr
 	}
 	// If the sapling consensus branch doesn't exist, it must be regtest
